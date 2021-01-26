@@ -41,11 +41,12 @@ func printKey(t *testing.T, priv *rsa.PrivateKey) {
 		Bytes: x509.MarshalPKCS1PrivateKey(priv),
 	}
 
-	pubB, err := x509.MarshalPKIXPublicKey(&priv.PublicKey)
-	if err != nil {
-		t.Errorf("x509.MarshalPKIXPublicKey error: %v", err)
-		return
-	}
+	pubB := x509.MarshalPKCS1PublicKey(&priv.PublicKey)
+	// pubB, err := x509.MarshalPKIXPublicKey(&priv.PublicKey)
+	// if err != nil {
+	// 	t.Errorf("x509.MarshalPKIXPublicKey error: %v", err)
+	// 	return
+	// }
 
 	pubPemBlk := &pem.Block{
 		Type:  "RSA PUBLIC KEY",

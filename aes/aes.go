@@ -81,8 +81,7 @@ func DecryptWithLeadingIV(in, key []byte) (res []byte, err error) {
 	res = make([]byte, len(in))
 	mode.CryptBlocks(res, in)
 
-	res = unpadPKCS7(res)
-	return res, nil
+	return unpadPKCS7(res)
 }
 
 // EncryptWithIVNotLeading 加密，但在密文的最前面没有 IV。解密者需要手动指定
@@ -131,8 +130,7 @@ func DecryptWithIVNotLeading(in, key, iv []byte) (res []byte, err error) {
 	res = make([]byte, len(in))
 	mode.CryptBlocks(res, in)
 
-	res = unpadPKCS7(res)
-	return res, nil
+	return unpadPKCS7(res)
 }
 
 // EncryptWithoutIV 使用无视 IV 的模式进行加密
@@ -151,8 +149,19 @@ func padPKCS7(b []byte, blockSize int) []byte {
 	return append(b, padtext...)
 }
 
-func unpadPKCS7(b []byte) []byte {
+func unpadPKCS7(b []byte) ([]byte, error) {
 	le := len(b)
+	if le <= 0 {
+		return nil, fmt.Errorf("invalid PKCS7 length: %d", le)
+	}
+	if le < len(b) {
+		return nil, fmt.Errorf("invalid PKCS7 length %d (totally %d)", le, len(b))
+	}
+
 	unPadding := int(b[le-1])
-	return b[:(le - unPadding)]
+	if le-unPadding < 0 || le-unPadding > len(b) {
+		return nil, fmt.Errorf("invalid unpadding offset %d (totally %d)", le-unPadding, len(b))
+	}
+
+	return b[:(le - unPadding)], nil
 }

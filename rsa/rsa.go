@@ -6,7 +6,7 @@ import (
 	"io"
 	"math/big"
 
-	selfcrypto "gitlab.com/Andrew-M-C/go.crypto"
+	selfcrypto "github.com/Andrew-M-C/go-crypto"
 )
 
 const (

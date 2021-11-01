@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"io"
 
-	crypto "gitlab.com/Andrew-M-C/go.crypto"
+	crypto "github.com/Andrew-M-C/go-crypto"
 )
 
 const (

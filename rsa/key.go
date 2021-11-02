@@ -149,7 +149,7 @@ func resolvePubData(data []byte) (info pubInfo, err error) {
 	if err != nil {
 		return
 	}
-	data, info.n, err = resolveBigInt(data, length)
+	_, info.n, err = resolveBigInt(data, length)
 	if err != nil {
 		return
 	}
@@ -181,4 +181,39 @@ func resolveBigInt(data []byte, length int) (remains []byte, i *big.Int, err err
 	i = new(big.Int)
 	i.SetBytes(data[:length])
 	return data[length:], i, nil
+}
+
+// ParsePublicKeyPemByFile 从文件中解析 .pem 公钥
+func ParsePublicKeyPemByFile(filepath string) (key *rsa.PublicKey, err error) {
+	text, err := os.ReadFile(filepath)
+	if err != nil {
+		return nil, fmt.Errorf("ReadFile %s error: %w", filepath, err)
+	}
+
+	return ParsePublicKeyPem(text)
+}
+
+// ParsePublicKeyPem 解析 .pem 公钥正文
+func ParsePublicKeyPem(text []byte) (key *rsa.PublicKey, err error) {
+	blk, _ := pem.Decode(text)
+	if blk == nil || len(blk.Bytes) == 0 {
+		return nil, errors.New("no key text found")
+	}
+
+	key, err = x509.ParsePKCS1PublicKey(blk.Bytes)
+	if err == nil {
+		return key, nil
+	}
+	if strings.Contains(err.Error(), "ParsePKCS1PublicKey") {
+		err = nil
+		// and continue trying
+	} else {
+		return nil, fmt.Errorf("ParsePKCS1PrivateKey error: %w", err)
+	}
+
+	key, err = x509.ParsePKCS1PublicKey(blk.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("ParsePKCS1PublicKey error: %w", err)
+	}
+	return key, nil
 }

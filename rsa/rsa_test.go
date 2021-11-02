@@ -60,6 +60,4 @@ func printKey(t *testing.T, priv *rsa.PrivateKey) {
 	pem.Encode(buff, pubPemBlk)
 
 	t.Log(buff.String())
-
-	return
 }

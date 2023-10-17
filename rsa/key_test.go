@@ -1,4 +1,4 @@
-package rsa
+package rsa_test
 
 import (
 	"bytes"
@@ -11,6 +11,8 @@ import (
 	"encoding/pem"
 	"os"
 	"testing"
+
+	amcrsa "github.com/Andrew-M-C/go-crypto/rsa"
 )
 
 func home() string {
@@ -21,10 +23,10 @@ func TestParseKey(t *testing.T) {
 	privpath := home() + "/.ssh/id_rsa"
 	pubpath := home() + "/.ssh/id_rsa.pub"
 
-	priv, err := ParsePrivateKeyPemByFile(privpath)
+	priv, err := amcrsa.ParsePrivateKeyPemByFile(privpath)
 	checkError(t, err, "ParsePrivateKeyPemByFile")
 
-	pub, err := ParsePublicKeyPubByFile(pubpath)
+	pub, err := amcrsa.ParsePublicKeyPubByFile(pubpath)
 	checkError(t, err, "ParsePublicKeyPubByFile")
 
 	// 生成 .pem 格式的 pub key，并重新读回来
@@ -34,19 +36,19 @@ func TestParseKey(t *testing.T) {
 		Bytes: pubB,
 	}
 	buff := &bytes.Buffer{}
-	pem.Encode(buff, pubPemBlk)
+	_ = pem.Encode(buff, pubPemBlk)
 
-	pub, err = ParsePublicKeyPem(buff.Bytes())
+	pub, err = amcrsa.ParsePublicKeyPem(buff.Bytes())
 	checkError(t, err, "ParsePublicKeyPem")
 
 	// 加解密检查
 	text := "Hello, RSA!"
 
-	ciphertext, err := EncryptPKCS1v15PrivateKey(rand.Reader, priv, []byte(text))
+	ciphertext, err := amcrsa.EncryptPKCS1v15PrivateKey(rand.Reader, priv, []byte(text))
 	checkError(t, err, "EncryptPKCS1v15PrivateKey")
 	t.Logf("Got encrypted data: %s", hex.EncodeToString(ciphertext))
 
-	plain, err := DecryptPKCS1v15PublicKey(pub, ciphertext)
+	plain, err := amcrsa.DecryptPKCS1v15PublicKey(pub, ciphertext)
 	checkError(t, err, "DecryptPKCS1v15PublicKey")
 
 	if s := string(plain); s != text {

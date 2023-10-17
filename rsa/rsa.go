@@ -6,12 +6,12 @@ import (
 	"io"
 	"math/big"
 
-	selfcrypto "github.com/Andrew-M-C/go-crypto"
+	cryptoerr "github.com/Andrew-M-C/go-crypto/errors"
 )
 
 const (
 	// ErrNilKey 表示空钥
-	ErrNilKey = selfcrypto.E("nil key")
+	ErrNilKey = cryptoerr.E("nil key")
 )
 
 var (

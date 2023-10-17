@@ -1,4 +1,4 @@
-package aes
+package aes_test
 
 import (
 	"crypto/rand"
@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"testing"
+
+	amcaes "github.com/Andrew-M-C/go-crypto/aes"
 )
 
 func checkError(t *testing.T, err error, text string) {
@@ -21,26 +23,26 @@ func TestAesWithLeadingIV(t *testing.T) {
 	key24, _ := hex.DecodeString("0123456789abcdef0123456789abcdef0123456789abcdef")
 	key32, _ := hex.DecodeString("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
 
-	cip128, err := EncryptWithRandomLeadingIV(raw, key16)
+	cip128, err := amcaes.EncryptWithRandomLeadingIV(raw, key16)
 	checkError(t, err, "EncryptWithRandomLeadingIV-128")
 
-	cip192, err := EncryptWithRandomLeadingIV(raw, key24)
+	cip192, err := amcaes.EncryptWithRandomLeadingIV(raw, key24)
 	checkError(t, err, "EncryptWithRandomLeadingIV-192")
 
-	cip256, err := EncryptWithRandomLeadingIV(raw, key32)
+	cip256, err := amcaes.EncryptWithRandomLeadingIV(raw, key32)
 	checkError(t, err, "EncryptWithRandomLeadingIV-256")
 
 	t.Logf("128: %s", hex.EncodeToString(cip128))
 	t.Logf("192: %s", hex.EncodeToString(cip192))
 	t.Logf("256: %s", hex.EncodeToString(cip256))
 
-	dec128, err := DecryptWithLeadingIV(cip128, key16)
+	dec128, err := amcaes.DecryptWithLeadingIV(cip128, key16)
 	checkError(t, err, "DecryptWithLeadingIV-128")
 
-	dec192, err := DecryptWithLeadingIV(cip192, key24)
+	dec192, err := amcaes.DecryptWithLeadingIV(cip192, key24)
 	checkError(t, err, "DecryptWithLeadingIV-192")
 
-	dec256, err := DecryptWithLeadingIV(cip256, key32)
+	dec256, err := amcaes.DecryptWithLeadingIV(cip256, key32)
 	checkError(t, err, "DecryptWithLeadingIV-256")
 
 	t.Logf("128: %s", string(dec128))
@@ -57,16 +59,16 @@ func TestAesWithoutLeadingIV(t *testing.T) {
 
 	t.Logf("IV:  %s", hex.EncodeToString(iv))
 
-	cipNoIV, err := EncryptWithoutIV(raw, key16)
+	cipNoIV, err := amcaes.EncryptWithoutIV(raw, key16)
 	checkError(t, err, "EncryptWithoutIV-128")
 
-	cip128, err := EncryptWithIVNotLeading(raw, key16, iv)
+	cip128, err := amcaes.EncryptWithIVNotLeading(raw, key16, iv)
 	checkError(t, err, "EncryptWithIVNotLeading-128")
 
-	cip192, err := EncryptWithIVNotLeading(raw, key24, iv)
+	cip192, err := amcaes.EncryptWithIVNotLeading(raw, key24, iv)
 	checkError(t, err, "EncryptWithIVNotLeading-192")
 
-	cip256, err := EncryptWithIVNotLeading(raw, key32, iv)
+	cip256, err := amcaes.EncryptWithIVNotLeading(raw, key32, iv)
 	checkError(t, err, "EncryptWithIVNotLeading-256")
 
 	t.Logf("nIV: %s", hex.EncodeToString(cipNoIV))
@@ -74,16 +76,16 @@ func TestAesWithoutLeadingIV(t *testing.T) {
 	t.Logf("192: %s", hex.EncodeToString(cip192))
 	t.Logf("256: %s", hex.EncodeToString(cip256))
 
-	decNoIV, err := DecryptWithoutIV(cipNoIV, key16)
+	decNoIV, err := amcaes.DecryptWithoutIV(cipNoIV, key16)
 	checkError(t, err, "DecryptWithoutIV-128")
 
-	dec128, err := DecryptWithIVNotLeading(cip128, key16, iv)
+	dec128, err := amcaes.DecryptWithIVNotLeading(cip128, key16, iv)
 	checkError(t, err, "DecryptWithIVNotLeading-128")
 
-	dec192, err := DecryptWithIVNotLeading(cip192, key24, iv)
+	dec192, err := amcaes.DecryptWithIVNotLeading(cip192, key24, iv)
 	checkError(t, err, "DecryptWithIVNotLeading-192")
 
-	dec256, err := DecryptWithIVNotLeading(cip256, key32, iv)
+	dec256, err := amcaes.DecryptWithIVNotLeading(cip256, key32, iv)
 	checkError(t, err, "DecryptWithIVNotLeading-256")
 
 	t.Logf("nIV: %s", string(decNoIV))
@@ -94,6 +96,6 @@ func TestAesWithoutLeadingIV(t *testing.T) {
 
 func genIV() []byte {
 	iv := make([]byte, 16)
-	io.ReadFull(rand.Reader, iv)
+	_, _ = io.ReadFull(rand.Reader, iv)
 	return iv
 }

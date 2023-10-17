@@ -9,12 +9,12 @@ import (
 	"fmt"
 	"io"
 
-	crypto "github.com/Andrew-M-C/go-crypto"
+	cryptoerr "github.com/Andrew-M-C/go-crypto/errors"
 )
 
 const (
 	// ErrIllegalIV 表示初始向量不合法
-	ErrIllegalIV = crypto.E("illegal initial vactor")
+	ErrIllegalIV = cryptoerr.E("illegal initial vactor")
 )
 
 var (

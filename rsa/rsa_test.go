@@ -1,4 +1,4 @@
-package rsa
+package rsa_test
 
 import (
 	"bytes"
@@ -9,6 +9,8 @@ import (
 	"encoding/pem"
 	"os"
 	"testing"
+
+	amcrsa "github.com/Andrew-M-C/go-crypto/rsa"
 )
 
 func checkError(t *testing.T, err error, text string) {
@@ -24,12 +26,12 @@ func TestRsaEncDec(t *testing.T) {
 
 	plain := []byte("Hello, world!")
 
-	cipher, err := EncryptPKCS1v15PrivateKey(rand.Reader, priv, plain)
+	cipher, err := amcrsa.EncryptPKCS1v15PrivateKey(rand.Reader, priv, plain)
 	checkError(t, err, "EncryptPKCS1v15PrivateKey")
 
 	t.Logf("cipher (len %d): %s", len(cipher), hex.EncodeToString(cipher))
 
-	dec, err := DecryptPKCS1v15PublicKey(&priv.PublicKey, cipher)
+	dec, err := amcrsa.DecryptPKCS1v15PublicKey(&priv.PublicKey, cipher)
 	checkError(t, err, "DecryptPKCS1v15PublicKey")
 
 	t.Logf("dec: %s", string(dec))
@@ -54,10 +56,10 @@ func printKey(t *testing.T, priv *rsa.PrivateKey) {
 	}
 
 	buff := &bytes.Buffer{}
-	pem.Encode(buff, privPemBlk)
+	_ = pem.Encode(buff, privPemBlk)
 
 	buff.WriteString("\n\n\n")
-	pem.Encode(buff, pubPemBlk)
+	_ = pem.Encode(buff, pubPemBlk)
 
 	t.Log(buff.String())
 }

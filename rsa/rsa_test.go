@@ -7,32 +7,24 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	"encoding/pem"
-	"os"
 	"testing"
 
 	amcrsa "github.com/Andrew-M-C/go-crypto/rsa"
 )
 
-func checkError(t *testing.T, err error, text string) {
-	if err != nil {
-		t.Errorf("%s error: %v", text, err)
-		os.Exit(-1)
-	}
-}
-
-func TestRsaEncDec(t *testing.T) {
+func testRsaEncDec(t *testing.T) {
 	priv, _ := rsa.GenerateKey(rand.Reader, 2048)
 	printKey(t, priv)
 
 	plain := []byte("Hello, world!")
 
 	cipher, err := amcrsa.EncryptPKCS1v15PrivateKey(rand.Reader, priv, plain)
-	checkError(t, err, "EncryptPKCS1v15PrivateKey")
+	so(err, isNil)
 
 	t.Logf("cipher (len %d): %s", len(cipher), hex.EncodeToString(cipher))
 
 	dec, err := amcrsa.DecryptPKCS1v15PublicKey(&priv.PublicKey, cipher)
-	checkError(t, err, "DecryptPKCS1v15PublicKey")
+	so(err, isNil)
 
 	t.Logf("dec: %s", string(dec))
 }
